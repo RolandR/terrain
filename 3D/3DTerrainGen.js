@@ -1,6 +1,7 @@
 var args = window.location.search;
 var seed;
 var setRuggedness;
+var setIterations;
 if(args){
 	seed = args.split("seed=")[1];
 	if(seed){
@@ -43,7 +44,6 @@ function generateTerrain(){
 		addTerrainPoints();
 	}
 	document.getElementById("points").innerHTML = "Points: "+terrainPoints.length * terrainPoints[0].length;
-	console.log(terrainPoints.length);
 	setInterval(rotateTerrain, 1);
 }
 

@@ -15,7 +15,6 @@ function Renderer(){
 	
 	var args = window.location.search;
 	var zoom = 2000/width;
-	console.log(zoom);
 	if(args){
 		zoomArgs = args.split("zoom=")[1];
 		if(zoomArgs){
