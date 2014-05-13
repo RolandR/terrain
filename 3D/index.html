@@ -1,0 +1,36 @@
+	<!doctype html>
+<html>
+	<head>
+		<title>
+			Three Dimensions!
+		</title>
+		<style>
+			*{
+				border: none;
+				margin: 0px;
+				padding: 0px;
+			}
+			body{
+				background-color: #DDCCFF;
+				overflow: hidden;
+			}
+			#info{
+				position: absolute;
+				font-family: sans-serif;
+				margin: 4px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<span id="points">Generating...</span><br />
+			<span id="fps"></span>
+		</div>
+		<canvas id="renderCanvas" width="600" height="600">
+			
+		</canvas>
+	</body>
+	<script type="text/javascript" src="./seededRNG.js"></script>
+	<script type="text/javascript" src="./3DTerrainRenderer.js"></script>
+	<script type="text/javascript" src="./3DTerrainGen.js"></script>
+</html>
