@@ -1,0 +1,44 @@
+	<!doctype html>
+<html>
+	<head>
+		<title>
+			Terrain Flyer
+		</title>
+		<style>
+			*{
+				border: none;
+				margin: 0px;
+				padding: 0px;
+			}
+			body{
+				background-color: #DDCCFF;
+				overflow: hidden;
+			}
+			#info{
+				position: absolute;
+				font-family: sans-serif;
+				margin: 4px;
+			}
+			.grapherCanvas{
+				position: absolute;
+				bottom: 0px;
+				right: 0px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<span id="points">Generating...</span><br />
+			<span id="fps"></span>
+		</div>
+		<canvas id="renderCanvas" width="600" height="600">
+			
+		</canvas>
+	</body>
+	<script type="text/javascript" src="../../grapher/grapher.js"></script>
+	<script type="text/javascript">var grapher = new Grapher({width: 1000, pointAmountDisplayed: 50});</script>
+	<script type="text/javascript" src="./SeededRNG.js"></script>
+	<script type="text/javascript" src="./Renderer.js"></script>
+	<script type="text/javascript" src="./TerrainGen.js"></script>
+	<script type="text/javascript" src="./TerrainFlyer.js"></script>
+</html>

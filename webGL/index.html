@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+	<head>
+		<title>
+			WebGL Random Terrain
+		</title>
+		<link href="./style.css" rel="stylesheet" type="text/css" media="all">
+	</head>
+	<body>
+		<div id="preRender" style="visibility: hidden;">
+			<canvas id="terrainPreRenderCanvas">
+				Needs more canvas
+			</canvas>
+			<img src="./temperatureGradient.png" alt="" id="temperatureGradient" />
+			<canvas id="temperatureGradientCanvas">
+				Needs more canvas
+			</canvas>
+		</div>
+		<div id="canvasContainer">
+			<p id="hangOn">Hang on...</p>
+		</div>
+	</body>
+	<script type="text/javascript" src="./three.min.js"></script>
+	<script type="text/javascript" src="./OrbitControls.js"></script>
+	<script type="text/javascript" src="./ThreeRenderer.js"></script>
+	<script type="text/javascript" src="./terrainGen.js"></script>
+</html>
