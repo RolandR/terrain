@@ -2,7 +2,8 @@ function Renderer(){
 	
 	var framesSinceCount = 0;
 	
-	var objects = [];
+	var objects;
+	var colors;
 	
 	var canvas = document.getElementById('renderCanvas');
 	var context = canvas.getContext("2d");
@@ -16,6 +17,8 @@ function Renderer(){
 	var height = canvas.height;
 
 	var imageData = new ImageData(width, height);
+
+	var objectSize = 4;
 
 	window.onresize = function(){
 		canvas.width = ~~(window.innerWidth/2);
@@ -120,8 +123,6 @@ function Renderer(){
 
 	function renderAll(){
 		framesSinceCount++;
-		
-		var a = objects.length;
 
 		//imageData = new ImageData(width, height);
 		
@@ -138,24 +139,26 @@ function Renderer(){
 		//World.vanishingPointY += World.vanishingPointY * scale;
 
 		var data = new Uint8ClampedArray(height*width*4);
+		//var data = [];
 		
-		for(var i = 0; i < a; i++){
-			point = objects[i];
+		for(var i = 0; i < objects.length; i+=objectSize){
 			
-			if(point.y > 0 && point.y < point.vanishY){
-				distanceFactor = 1-(World.vanishingPointY/(zoom*point.y));
-				renderY = ~~(point.z + distanceFactor * (World.vanishingPointZ - point.z));
-				renderX = ~~(point.x + distanceFactor * (World.vanishingPointX - point.x));
+			if(objects[i+1] > 0 && objects[i+1] < objects[i+3]){
+				
+				distanceFactor = 1-(World.vanishingPointY/(zoom*objects[i+1]));
+				renderY = ~~(objects[i+2] + distanceFactor * (World.vanishingPointZ - objects[i+2]));
+				renderX = ~~(objects[i  ] + distanceFactor * (World.vanishingPointX - objects[i  ]));
+				
 				if(renderX > 0 && renderX < width && renderY > 0 && renderY < height){
 					pos0 = (renderY	* width + renderX ) * 4;
-					c = 255 - ~~(255 * point.y / World.vanishingPointY);
+					c = 255 - ~~(255 * objects[i+1] / World.vanishingPointY);
 					if(data[pos0+3] < c){
-						if(point.sea){
-							data[pos0+2] = 255;
-						} else {
-							data[pos0+2] = 0;
-						}
+						
+						data[pos0  ] = colors[i  ];
+						data[pos0+1] = colors[i+1];
+						data[pos0+2] = colors[i+2];
 						data[pos0+3] = c;
+						
 					}
 				}
 			}
@@ -171,8 +174,8 @@ function Renderer(){
 	
 	function rotateAll(){
 		
-		for(var i = 0; i < objects.length; i++){
-			rotateZ(objects[i], rotateAngle, rotateCenter);
+		for(var i = 0; i < objects.length; i+=objectSize){
+			rotateZ(i, rotateAngle, rotateCenter);
 			//rotate(objects[i], [0.0111111, 0.007631, 0.01], [width/2, 150, width/2]);
 		}
 
@@ -180,9 +183,9 @@ function Renderer(){
 			var zAngle = [Math.sin(0.01 * panX), Math.cos(0.01 * panX)];
 			var yAngle = [Math.sin(0.01 * -panY), Math.cos(0.01 * -panY)];
 			
-			for(var i = 0; i < objects.length; i++){
-				rotateZ(objects[i], zAngle, rotateCenter);
-				rotateX(objects[i], yAngle, rotateCenter);
+			for(var i = 0; i < objects.length; i+=objectSize){
+				rotateZ(i, zAngle, rotateCenter);
+				rotateX(i, yAngle, rotateCenter);
 			}
 
 			panX = 0;
@@ -190,8 +193,8 @@ function Renderer(){
 		}
 
 		if(moveX || moveZ){
-			for(var i = 0; i < objects.length; i++){
-				translate(objects[i], [moveX, 0, moveZ]);
+			for(var i = 0; i < objects.length; i+=objectSize){
+				translate(i, [moveX, 0, moveZ]);
 			}
 
 			rotateCenter[0] += moveX;
@@ -201,8 +204,8 @@ function Renderer(){
 		}
 
 		if(moveY){
-			for(var i = 0; i < objects.length; i++){
-				translate(objects[i], [0, moveY, 0]);
+			for(var i = 0; i < objects.length; i+=objectSize){
+				translate(i, [0, moveY, 0]);
 			}
 
 			rotateCenter[1] += moveY;
@@ -210,53 +213,40 @@ function Renderer(){
 		}
 	}
 
-	function rotateX(object, angle, center){
-		var y = object.y - center[1]
-		var z = object.z - center[2]
+	function rotateX(i, angle, center){		
+		var y = objects[i+1] - center[1]
+		var z = objects[i+2] - center[2]
 
-		object.y = y * angle[1] - z * angle[0];
-		object.z = y * angle[0] + z * angle[1];
-
-		object.y += center[1];
-		object.z += center[2];
+		objects[i+1] = y * angle[1] - z * angle[0] + center[1];
+		objects[i+2] = y * angle[0] + z * angle[1] + center[2];
 	}
 
-	function rotateY(object, angle, center){
-		var x = object.x - center[0]
-		var z = object.z - center[2]
+	function rotateY(i, angle, center){
+		var x = objects[i  ] - center[0]
+		var z = objects[i+2] - center[2]
 
-		object.z = z * angle[1] - x * angle[0];
-		object.x = z * angle[0] + x * angle[1];
-
-		object.x += center[0];
-		object.z += center[2];
+		objects[i+2] = z * angle[1] - x * angle[0] + center[0];
+		objects[i  ] = z * angle[0] + x * angle[1] + center[2];
 	}
 
-	function rotateZ(object, angle, center){
-		var x = object.x - center[0]
-		var y = object.y - center[1]
+	function rotateZ(i, angle, center){
+		var x = objects[i  ] - center[0]
+		var y = objects[i+1] - center[1]
 
-		object.x = x * angle[1] - y * angle[0];
-		object.y = x * angle[0] + y * angle[1];
-
-		object.x += center[0];
-		object.y += center[1];
+		objects[i  ] = x * angle[1] - y * angle[0] + center[0];
+		objects[i+1] = x * angle[0] + y * angle[1] + center[1];
 	}
 
-	function scale(object, factor){
-		object.x *= factor;
-		object.y *= factor;
-		object.z *= factor;
-		
-		return object;
+	function scale(i, factor){
+		objects[i  ] *= factor;
+		objects[i+1] *= factor;
+		objects[i+2] *= factor;
 	}
 
-	function translate(object, coords){
-		object.x += coords[0];
-		object.y += coords[1];
-		object.z += coords[2];
-		
-		return object;
+	function translate(i, coords){
+		objects[i  ] += coords[0];
+		objects[i+1] += coords[1];
+		objects[i+2] += coords[2];
 	}
 
 	function minmax(number, min, max){
@@ -270,17 +260,40 @@ function Renderer(){
 	}
 	
 	function setPoints(points){
-		objects = points;
+		//objects = new Float32Array(objectSize * points.length);
+		objects = [];
+		colors = new Uint8ClampedArray(objectSize*points.length);
 		
-		for(var i in objects){
-			objects[i].vanishY = World.vanishingPointY * Math.random();
+		for(var i = 0; i < points.length; i++){
+			points[i].vanishY = World.vanishingPointY * Math.random();
 			if(points[i].z > 0){
-				points[i].sea = true;
+
+				colors[i*objectSize  ] = 0;
+				colors[i*objectSize+1] = 0;
+				colors[i*objectSize+2] = 255 - points[i].z * 5;
+				
 				points[i].z = 0;
+			} else {
+				var val = 0-points[i].z * 10;
+
+				val = Math.round(val/(Math.random()*50 + 50)) * 100;
+				
+				colors[i*objectSize  ] = val;
+				colors[i*objectSize+1] = val;
+				colors[i*objectSize+2] = val;
 			}
-			scale(objects[i], 2);
-			translate(objects[i], [width/2 - 300, 100, height/2]);
-			translate(objects[i], [Math.random(), Math.random(), 0]);
+			
+			objects[i*objectSize  ] = points[i].x;
+			objects[i*objectSize+1] = points[i].y;
+			objects[i*objectSize+2] = points[i].z;
+			objects[i*objectSize+3] = points[i].vanishY;
+			
+		}
+
+		for(var i = 0; i < objects.length; i+=objectSize){
+			scale(i, 2);
+			translate(i, [width/2 - 300, 100, height/2]);
+			translate(i, [Math.random(), Math.random(), 0]);
 		}
 	}
 	
