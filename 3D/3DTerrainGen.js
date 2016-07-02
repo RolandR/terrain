@@ -36,21 +36,21 @@ if(setRuggedness){
 	ruggedness = setRuggedness;
 }
 
-render();
 setTimeout(generateTerrain, 150);
 
 function generateTerrain(){
 	for(var i = 0; i < iterations; i++){
 		addTerrainPoints();
 	}
+	render();
 	document.getElementById("points").innerHTML = "Points: "+terrainPoints.length * terrainPoints[0].length;
-	setInterval(rotateTerrain, 1);
+	rotateTerrain();
 }
 
 function rotateTerrain(){
 	Renderer.rotateAll();
 	Renderer.renderAll();
-	//setTimeout(rotateTerrain, 10);
+	window.requestAnimationFrame(rotateTerrain);
 }
 
 function addTerrainPoints(){
@@ -76,7 +76,6 @@ function addTerrainPoints(){
 		}
 		terrainPoints.splice(y+1,0,newRow);
 	}
-	render();
 }
 
 function render(){
@@ -93,13 +92,11 @@ function render(){
 				 x: x*size
 				,y: y*size
 				,z: terrainPoints[y][x]
-				,type: "point"
 			});
 		}
 	}
 	
 	Renderer.setPoints(points);
-	Renderer.renderAll();
 }
 
 
