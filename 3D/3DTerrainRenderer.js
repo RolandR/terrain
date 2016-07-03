@@ -146,18 +146,23 @@ function Renderer(){
 			if(objects[i+1] > 0 && objects[i+1] < objects[i+3]){
 				
 				distanceFactor = 1-(World.vanishingPointY/(zoom*objects[i+1]));
-				renderY = ~~(objects[i+2] + distanceFactor * (World.vanishingPointZ - objects[i+2]));
 				renderX = ~~(objects[i  ] + distanceFactor * (World.vanishingPointX - objects[i  ]));
 				
-				if(renderX > 0 && renderX < width && renderY > 0 && renderY < height){
-					pos0 = (renderY	* width + renderX ) * 4;
-					c = 255 - ~~(255 * objects[i+1] / World.vanishingPointY);
-					if(data[pos0+3] < c){
+				if(renderX > 0 && renderX < width){
+					renderY = ~~(objects[i+2] + distanceFactor * (World.vanishingPointZ - objects[i+2]));
+					
+					if(renderY > 0 && renderY < height){
 						
-						data[pos0  ] = colors[i  ];
-						data[pos0+1] = colors[i+1];
-						data[pos0+2] = colors[i+2];
-						data[pos0+3] = c;
+						pos0 = (renderY	* width + renderX ) * 4;
+						c = 255 - ~~(255 * objects[i+1] / (World.vanishingPointY*2));
+						if(data[pos0+3] < c){
+							
+							data[pos0  ] = colors[i  ];
+							data[pos0+1] = colors[i+1];
+							data[pos0+2] = colors[i+2];
+							data[pos0+3] = c;
+							
+						}
 						
 					}
 				}
@@ -281,6 +286,15 @@ function Renderer(){
 				colors[i*objectSize  ] = val;
 				colors[i*objectSize+1] = val;
 				colors[i*objectSize+2] = val;
+
+				if(points[i].z > -6){
+					colors[i*objectSize+1] += 20 * (6 + points[i].z);
+
+					if(points[i].z > -2){
+						colors[i*objectSize  ] += 130 * (2 + points[i].z);
+						colors[i*objectSize+1] += 45 * (2 + points[i].z);
+					}
+				}
 			}
 			
 			objects[i*objectSize  ] = points[i].x;
